@@ -16,9 +16,14 @@ exports.create = async (req, res) => {
       location_url,
       menu,
       images,
+      estado 
     } = req.body;
 
     const { id: creador_id } = req.user;
+
+    const estadoInicial =
+      estado ??
+      (new Date(fecha_hora) > new Date() ? 'upcoming' : 'active');
 
     const { rows } = await pool.query(
       `INSERT INTO experiencias
@@ -26,13 +31,13 @@ exports.create = async (req, res) => {
           capacidad, cupos_disponibles,
           precio, ciudad, duracion,
           event_type, requirements, location_url,
-          menu, images)
+          menu, images, estado)
        VALUES
          ($1,$2,$3,$4,
           $5,$5,
           $6,$7,$8,
           $9,$10,$11,
-          $12,$13)
+          $12,$13, $14)
        RETURNING *`,
       [
         creador_id,
@@ -48,6 +53,7 @@ exports.create = async (req, res) => {
         location_url,
         menu,
         images,
+        estadoInicial
       ]
     );
 
